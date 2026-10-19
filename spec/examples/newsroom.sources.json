@@ -1,0 +1,38 @@
+{
+  "module": "sources",
+  "domain": "newsroom",
+  "instance": "desk",
+  "objects": [
+    {
+      "role": "source",
+      "name": "record",
+      "table": "records",
+      "description": "A document, dataset, recording or interview a story is reported from.",
+      "indexes": [
+        {
+          "name": "attribution",
+          "description": "Listing what may be quoted on the record against what is background only.",
+          "path": { "field": "properties", "path": "attribution" }
+        }
+      ]
+    },
+    {
+      "role": "annotation",
+      "name": "attribution",
+      "table": "attributions",
+      "description": "A sentence of a story tied to the record it was reported from."
+    },
+    {
+      "role": "verification",
+      "name": "fact_check",
+      "table": "fact_checks",
+      "description": "A checker confirming that a sentence says what its record supports."
+    },
+    {
+      "role": "chunk",
+      "name": "excerpt",
+      "table": "excerpts",
+      "description": "A stretch of a record's text, held so a reporter can find the line they remember."
+    }
+  ]
+}

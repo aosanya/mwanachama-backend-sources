@@ -1,0 +1,14 @@
+package sources
+
+import "errors"
+
+var (
+	ErrSourceNotFound      = errors.New("source not found")
+	ErrAnnotationNotFound  = errors.New("annotation not found")
+	ErrInvalidSource       = errors.New("invalid source")
+	ErrInvalidAnnotation   = errors.New("invalid annotation")
+	ErrInvalidVerification = errors.New("invalid verification")
+	ErrUnverifiedCaller    = errors.New("a verification needs a caller to stand behind it")
+	ErrInvalidChunk        = errors.New("invalid chunk")
+	ErrInvalidQuery        = errors.New("invalid search")
+)

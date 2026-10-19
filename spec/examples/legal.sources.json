@@ -1,0 +1,43 @@
+{
+  "module": "sources",
+  "domain": "legal",
+  "instance": "chambers",
+  "objects": [
+    {
+      "role": "source",
+      "name": "authority",
+      "table": "authorities",
+      "description": "A statute, judgment, regulation, treaty or contract that an opinion, brief or clause relies on.",
+      "indexes": [
+        {
+          "name": "jurisdiction",
+          "description": "Listing the authorities binding in one jurisdiction, which is the first narrowing any research question gets.",
+          "path": { "field": "properties", "path": "jurisdiction" }
+        },
+        {
+          "name": "rights",
+          "description": "Finding every authority held under one reuse right, so a licensed report series can be audited before it is quoted in a published document.",
+          "path": { "field": "properties", "path": "rights" }
+        }
+      ]
+    },
+    {
+      "role": "annotation",
+      "name": "citation",
+      "table": "citations",
+      "description": "A passage of a draft pinned to the authority it cites, with the words relied on."
+    },
+    {
+      "role": "verification",
+      "name": "cite_check",
+      "table": "cite_checks",
+      "description": "A paralegal or advocate confirming that an authority is still good law, or that a citation says what the draft claims it says."
+    },
+    {
+      "role": "chunk",
+      "name": "passage",
+      "table": "passages",
+      "description": "One section of an authority's text, held so a drafting assistant retrieves and cites it rather than inventing one."
+    }
+  ]
+}
