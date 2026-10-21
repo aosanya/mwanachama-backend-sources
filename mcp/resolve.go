@@ -18,7 +18,7 @@ const instanceArgument = "instance_id"
 
 var ErrInstanceRequired = errors.New("instance_id is required")
 
-type instanceKey struct{}
+type managerKey struct{}
 
 func RegisterResolvedTools(server *mcp.Server, resolve ManagerResolver, m routes.Mount) {
 	for _, t := range routes.Tools(resolving{resolve: resolve}, m) {
@@ -31,7 +31,7 @@ func RegisterResolvedTools(server *mcp.Server, resolve ManagerResolver, m routes
 			Title:       t.Title,
 			Description: t.Description,
 			InputSchema: withInstance(schema),
-		}, resolvedHandlerFor(t))
+		}, resolvedHandlerFor(t, resolve))
 	}
 }
 
@@ -50,10 +50,17 @@ func withInstance(schema map[string]any) map[string]any {
 	return schema
 }
 
-func resolvedHandlerFor(t routes.Tool) mcp.ToolHandler {
+func resolvedHandlerFor(t routes.Tool, resolve ManagerResolver) mcp.ToolHandler {
 	inner := handlerFor(t)
 	return func(ctx context.Context, req *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 		instanceID, rest, err := splitInstance(req.Params.Arguments)
+		if err != nil {
+			return &mcp.CallToolResult{
+				IsError: true,
+				Content: []mcp.Content{&mcp.TextContent{Text: err.Error()}},
+			}, nil
+		}
+		sm, err := resolve(ctx, instanceID)
 		if err != nil {
 			return &mcp.CallToolResult{
 				IsError: true,
@@ -64,7 +71,7 @@ func resolvedHandlerFor(t routes.Tool) mcp.ToolHandler {
 		params := *req.Params
 		params.Arguments = rest
 		forwarded.Params = &params
-		return inner(context.WithValue(ctx, instanceKey{}, instanceID), &forwarded)
+		return inner(context.WithValue(ctx, managerKey{}, sm), &forwarded)
 	}
 }
 

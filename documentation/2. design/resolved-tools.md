@@ -14,9 +14,10 @@ following `mwanachama-backend-agency`'s `ManagerResolver`:
 - The tools are built from `dispatch.Tools` over a delegating manager that
   calls `resolve(ctx, instance_id)` on every method, so the host's check
   (membership, in wakala-api) runs on every call and before any read or write.
-- A missing `instance_id` is refused with `ErrInstanceRequired`. A resolver
-  error is not one of `routes.Sentinels`, so `dispatch` answers it opaquely:
-  a host's "not a member" and "no such instance" read the same to the caller.
+- A missing `instance_id` is refused with `ErrInstanceRequired`. The manager is
+  resolved once, before `dispatch` runs, and a resolver error is answered with
+  its own text, so a host that answers a non-member as a missing instance keeps
+  that one refusal on MCP too.
 
 `WithProfiles` is a manager option, so it is the resolver's to apply when it
 builds a manager; nothing here changes it.

@@ -11,11 +11,10 @@ type resolving struct {
 }
 
 func (r resolving) manager(ctx context.Context) (sources.SourceManager, error) {
-	instanceID, _ := ctx.Value(instanceKey{}).(string)
-	if instanceID == "" {
-		return nil, ErrInstanceRequired
+	if sm, ok := ctx.Value(managerKey{}).(sources.SourceManager); ok {
+		return sm, nil
 	}
-	return r.resolve(ctx, instanceID)
+	return nil, ErrInstanceRequired
 }
 
 func (r resolving) CreateSource(ctx context.Context, in sources.Source) (sources.Source, error) {
