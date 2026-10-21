@@ -19,6 +19,7 @@ var Sentinels = map[string]error{
 	"ErrInvalidVerification": sources.ErrInvalidVerification,
 	"ErrUnverifiedCaller":    sources.ErrUnverifiedCaller,
 	"ErrInvalidChunk":        sources.ErrInvalidChunk,
+	"ErrInvalidDocument":     sources.ErrInvalidDocument,
 	"ErrInvalidQuery":        sources.ErrInvalidQuery,
 }
 

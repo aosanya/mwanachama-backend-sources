@@ -58,9 +58,18 @@ type Chunk struct {
 	SourceID       string    `json:"source_id"`
 	Position       int       `json:"position"`
 	Text           string    `json:"text"`
+	Heading        string    `json:"heading,omitempty"`
+	StartOffset    int       `json:"start_offset"`
+	EndOffset      int       `json:"end_offset"`
 	Embedding      []float64 `json:"embedding,omitempty"`
 	EmbeddingModel string    `json:"embedding_model,omitempty"`
 	CreatedAt      string    `json:"created_at"`
+}
+
+type Document struct {
+	SourceID string `json:"source_id"`
+	Text     string `json:"text"`
+	Format   string `json:"format,omitempty"`
 }
 
 type ChunkQuery struct {

@@ -235,6 +235,21 @@
           "required": true
         },
         {
+          "name": "heading",
+          "type": "string",
+          "description": "The headings the passage sits under in the document it was split from, outermost first and joined by \" / \", so an answer citing it can name the section. Empty when the passage sits under no heading or was filed on its own."
+        },
+        {
+          "name": "start_offset",
+          "type": "int",
+          "description": "Where the passage begins in the document it was split from, counted in bytes from the start of that document's text, so a citation can point at the exact words. Zero when the passage was filed on its own."
+        },
+        {
+          "name": "end_offset",
+          "type": "int",
+          "description": "Where the passage ends in the document it was split from, in bytes, one past its last byte. Zero when the passage was filed on its own."
+        },
+        {
           "name": "embedding",
           "type": "json",
           "description": "The passage as a vector of numbers, produced by whoever filed it. Searching compares a query's vector with this one, so every chunk searched together must come from the same model."

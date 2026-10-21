@@ -19,6 +19,7 @@ same table, and `mcp/mcp.go` registers them. One table, two surfaces.
 | POST | `/verifications` | `Verify` | `sources.verification.create` | 201 |
 | GET | `/verifications` | `ListVerifications` | `sources.verification.list` | 200 |
 | POST | `/sources/{sourceID}/chunks` | `AddChunk` | `sources.chunk.create` | 201 |
+| POST | `/sources/{sourceID}/documents` | `AddDocument` | `sources.document.create` | 201 |
 | GET | `/sources/{sourceID}/chunks` | `ListChunks` | `sources.chunk.list` | 200 |
 | POST | `/chunks/search` | `SearchChunks` | `sources.chunk.search` | 200 |
 
@@ -28,7 +29,7 @@ same table, and `mcp/mcp.go` registers them. One table, two surfaces.
   on verifications. The same binding keeps these fields out of every MCP tool
   schema.
 - **The address:** the source id on `PUT /sources/{sourceID}` and on
-  `POST /sources/{sourceID}/chunks`.
+  `POST /sources/{sourceID}/chunks` and `POST /sources/{sourceID}/documents`.
 - **The store:** `verifier_name` and `verifier_role` are overwritten by the
   profile lookup.
 

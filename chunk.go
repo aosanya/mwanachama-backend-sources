@@ -14,6 +14,9 @@ func (m *sourceManager) AddChunk(ctx context.Context, in Chunk) (Chunk, error) {
 	if in.Position < 0 {
 		return Chunk{}, fmt.Errorf("%w: position is %d, and a passage cannot fall before the start", ErrInvalidChunk, in.Position)
 	}
+	if in.StartOffset < 0 || in.EndOffset < in.StartOffset {
+		return Chunk{}, fmt.Errorf("%w: offsets %d to %d do not mark a passage", ErrInvalidChunk, in.StartOffset, in.EndOffset)
+	}
 	if len(in.Embedding) > 0 && in.EmbeddingModel == "" {
 		return Chunk{}, fmt.Errorf("%w: an embedding needs the model that produced it", ErrInvalidChunk)
 	}

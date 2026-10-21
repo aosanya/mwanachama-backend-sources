@@ -161,6 +161,25 @@
       ],
       "returns": [{ "body": true }]
     },
+    "add_document": {
+      "method": "POST",
+      "path": "/sources/{sourceID}/documents",
+      "call": "AddDocument",
+      "action": "sources.document.create",
+      "status": 201,
+      "title": "Add document",
+      "description": "Split a source's text, plain or Markdown, into passages at blank lines and headings, and hold each one with the headings it sits under and where it falls in the text, so an answer can cite the exact words. No vectors are produced.",
+      "args": [
+        { "from": "body", "whole": true },
+        {
+          "from": "path",
+          "as": "sourceID",
+          "into": "SourceID",
+          "description": "The source the document is the text of. The address decides, not the body."
+        }
+      ],
+      "returns": [{ "body": true }]
+    },
     "list_chunks": {
       "method": "GET",
       "path": "/sources/{sourceID}/chunks",
@@ -192,6 +211,7 @@
     "ErrInvalidVerification": 400,
     "ErrUnverifiedCaller": 401,
     "ErrInvalidChunk": 400,
+    "ErrInvalidDocument": 400,
     "ErrInvalidQuery": 400
   }
 }

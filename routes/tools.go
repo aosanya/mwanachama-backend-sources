@@ -46,6 +46,17 @@ var inputFields = map[string]dispatch.FieldDoc{
 	"VerificationFilter.subject_id": {
 		Description: "The source or annotation whose history to read.",
 	},
+	"Document.source_id": {
+		Description: "The source the document is the text of. The address decides, not the body.",
+	},
+	"Document.text": {
+		Description: "The whole text of the document. Passages are split at blank lines and, in Markdown, at headings.",
+		Required:    true,
+	},
+	"Document.format": {
+		Description: "How to read the text. Markdown headings name the section each passage sits under; plain text has none. Defaults to text.",
+		Values:      []string{"text", "markdown"},
+	},
 	"ChunkQuery.embedding": {
 		Description: "The query as a vector, produced by the same model as the passages it is compared with.",
 		Required:    true,

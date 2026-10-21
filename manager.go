@@ -21,6 +21,7 @@ type (
 	Verification       = models.Verification
 	VerificationFilter = models.VerificationFilter
 	Chunk              = models.Chunk
+	Document           = models.Document
 	ChunkQuery         = models.ChunkQuery
 	ChunkMatch         = models.ChunkMatch
 	Profile            = models.Profile
@@ -43,6 +44,7 @@ type SourceManager interface {
 	ListVerifications(ctx context.Context, filter VerificationFilter) ([]Verification, error)
 
 	AddChunk(ctx context.Context, in Chunk) (Chunk, error)
+	AddDocument(ctx context.Context, in Document) ([]Chunk, error)
 	ListChunks(ctx context.Context, sourceID string) ([]Chunk, error)
 	SearchChunks(ctx context.Context, q ChunkQuery) ([]ChunkMatch, error)
 }

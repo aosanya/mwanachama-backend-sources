@@ -98,6 +98,7 @@ func TestRoutesAreTheDeclaredTable(t *testing.T) {
 		"POST /chunks/search",
 		"POST /sources",
 		"POST /sources/{sourceID}/chunks",
+		"POST /sources/{sourceID}/documents",
 		"POST /verifications",
 		"PUT /sources/{sourceID}",
 	}
@@ -130,8 +131,8 @@ func TestEveryOperationIsATool(t *testing.T) {
 	if err != nil {
 		t.Fatalf("BuildTools: %v", err)
 	}
-	if len(tools) != 13 {
-		t.Fatalf("got %d tools, want 13", len(tools))
+	if len(tools) != 14 {
+		t.Fatalf("got %d tools, want 14", len(tools))
 	}
 }
 
@@ -181,4 +182,42 @@ func TestMissingSourceIs404(t *testing.T) {
 	if status, _ := do(t, srv, "GET", "/sources/missing", ""); status != http.StatusNotFound {
 		t.Fatalf("status = %d, want 404", status)
 	}
+}
+
+func TestTheAddressOutranksTheBodyOnADocument(t *testing.T) {
+	srv := newServer(t, "actor-9")
+	_, a := do(t, srv, "POST", "/sources", `{"title":"A"}`)
+	_, b := do(t, srv, "POST", "/sources", `{"title":"B"}`)
+	status, _ := do(t, srv, "POST", "/sources/"+a["id"].(string)+"/documents",
+		`{"source_id":"`+b["id"].(string)+`","text":"# H\n\npassage","format":"markdown"}`)
+	if status != http.StatusCreated {
+		t.Fatalf("status = %d", status)
+	}
+	if n := chunkCount(t, srv, b["id"].(string)); n != 0 {
+		t.Fatalf("the body's source got %d chunks", n)
+	}
+	if n := chunkCount(t, srv, a["id"].(string)); n != 1 {
+		t.Fatalf("the address's source got %d chunks, want 1", n)
+	}
+}
+
+func chunkCount(t *testing.T, srv *httptest.Server, sourceID string) int {
+	t.Helper()
+	res, err := http.Get(srv.URL + "/sources/" + sourceID + "/chunks")
+	if err != nil {
+		t.Fatalf("list chunks: %v", err)
+	}
+	defer res.Body.Close()
+	raw, _ := io.ReadAll(res.Body)
+	var items []map[string]any
+	if err := json.Unmarshal(raw, &items); err != nil {
+		var wrapped struct {
+			Items []map[string]any `json:"items"`
+		}
+		if err := json.Unmarshal(raw, &wrapped); err != nil {
+			t.Fatalf("list chunks: %s", raw)
+		}
+		items = wrapped.Items
+	}
+	return len(items)
 }
