@@ -7,6 +7,7 @@ import (
 
 	"gorm.io/gorm"
 
+	"github.com/aosanya/mwanachama-backend-shared/identity"
 	"github.com/aosanya/mwanachama-backend-shared/spec"
 	"github.com/aosanya/mwanachama-backend-shared/specstore"
 
@@ -30,6 +31,8 @@ type (
 type ProfileLookup func(ctx context.Context, actorID string) (Profile, error)
 
 type SourceManager interface {
+	identity.Owner
+
 	CreateSource(ctx context.Context, in Source) (Source, error)
 	GetSource(ctx context.Context, sourceID string) (Source, error)
 	ListSources(ctx context.Context, filter SourceFilter) ([]Source, error)

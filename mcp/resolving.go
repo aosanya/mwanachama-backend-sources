@@ -136,3 +136,19 @@ func (r resolving) SearchChunks(ctx context.Context, q sources.ChunkQuery) ([]so
 	}
 	return m.SearchChunks(ctx, q)
 }
+
+func (r resolving) StableIdentity(ctx context.Context, object, id string) (string, error) {
+	m, err := r.manager(ctx)
+	if err != nil {
+		return "", err
+	}
+	return m.StableIdentity(ctx, object, id)
+}
+
+func (r resolving) Resolve(ctx context.Context, raw string) (string, string, error) {
+	m, err := r.manager(ctx)
+	if err != nil {
+		return "", "", err
+	}
+	return m.Resolve(ctx, raw)
+}
