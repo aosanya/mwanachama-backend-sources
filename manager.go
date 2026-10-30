@@ -34,6 +34,7 @@ type SourceManager interface {
 	GetSource(ctx context.Context, sourceID string) (Source, error)
 	ListSources(ctx context.Context, filter SourceFilter) ([]Source, error)
 	UpdateSource(ctx context.Context, in Source) (Source, error)
+	DeleteSource(ctx context.Context, sourceID string) error
 
 	CreateAnnotation(ctx context.Context, in Annotation) (Annotation, error)
 	GetAnnotation(ctx context.Context, annotationID string) (Annotation, error)

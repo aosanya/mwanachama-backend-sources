@@ -114,3 +114,71 @@ func TestUpdateSourceCanClearProperties(t *testing.T) {
 		t.Fatalf("properties = %v, want them cleared", got.Properties)
 	}
 }
+
+func TestDeleteSourceRemovesItWithItsChunksAndVerifications(t *testing.T) {
+	db := openDB(t)
+	s := testSpec(t, "test")
+	if err := sources.Provision(db, s); err != nil {
+		t.Fatalf("Provision: %v", err)
+	}
+	mgr, err := sources.NewSourceManager(db, s, sources.WithProfiles(lookup))
+	if err != nil {
+		t.Fatalf("NewSourceManager: %v", err)
+	}
+	ctx := context.Background()
+	kept := mustSource(t, mgr, "Kept")
+	gone := mustSource(t, mgr, "Gone")
+	addChunk(t, mgr, kept.ID, 0, "kept chunk", nil, "")
+	addChunk(t, mgr, gone.ID, 0, "gone chunk", nil, "")
+	if _, err := mgr.Verify(ctx, sources.Verification{SubjectRole: "source", SubjectID: gone.ID, Status: "verified", VerifiedBy: "actor-1"}); err != nil {
+		t.Fatalf("Verify: %v", err)
+	}
+
+	if err := mgr.DeleteSource(ctx, gone.ID); err != nil {
+		t.Fatalf("DeleteSource: %v", err)
+	}
+
+	if _, err := mgr.GetSource(ctx, gone.ID); !errors.Is(err, sources.ErrSourceNotFound) {
+		t.Fatalf("GetSource err = %v, want ErrSourceNotFound", err)
+	}
+	var chunkTable string
+	if err := db.Raw("select m.name from sqlite_master m, pragma_table_info(m.name) p where m.type = 'table' and p.name = 'start_offset'").Row().Scan(&chunkTable); err != nil {
+		t.Fatalf("chunk table = %q, %v", chunkTable, err)
+	}
+	var orphaned int64
+	if err := db.Table(chunkTable).Where("source_id = ?", gone.ID).Count(&orphaned).Error; err != nil || orphaned != 0 {
+		t.Fatalf("chunk rows left behind = %d, %v", orphaned, err)
+	}
+	if held, err := mgr.ListVerifications(ctx, sources.VerificationFilter{SubjectRole: "source", SubjectID: gone.ID}); err != nil || len(held) != 0 {
+		t.Fatalf("verifications of the deleted source = %+v, %v", held, err)
+	}
+	if _, err := mgr.GetSource(ctx, kept.ID); err != nil {
+		t.Fatalf("the other source was lost: %v", err)
+	}
+	if chunks, err := mgr.ListChunks(ctx, kept.ID); err != nil || len(chunks) != 1 {
+		t.Fatalf("chunks of the other source = %+v, %v", chunks, err)
+	}
+}
+
+func TestDeleteSourceRefusesASourceThatAnnotationsRestOn(t *testing.T) {
+	mgr := newTestManager(t)
+	ctx := context.Background()
+	src := mustSource(t, mgr, "Employment Act, 2007")
+	if _, err := mgr.CreateAnnotation(ctx, sources.Annotation{SourceID: src.ID, TargetModule: "git", TargetID: "blob-1"}); err != nil {
+		t.Fatalf("CreateAnnotation: %v", err)
+	}
+
+	if err := mgr.DeleteSource(ctx, src.ID); !errors.Is(err, sources.ErrSourceInUse) {
+		t.Fatalf("err = %v, want ErrSourceInUse", err)
+	}
+	if _, err := mgr.GetSource(ctx, src.ID); err != nil {
+		t.Fatalf("the source was lost: %v", err)
+	}
+}
+
+func TestDeleteSourceOfAMissingSourceIsNotFound(t *testing.T) {
+	mgr := newTestManager(t)
+	if err := mgr.DeleteSource(context.Background(), "missing"); !errors.Is(err, sources.ErrSourceNotFound) {
+		t.Fatalf("err = %v, want ErrSourceNotFound", err)
+	}
+}

@@ -49,6 +49,14 @@ func (r resolving) UpdateSource(ctx context.Context, in sources.Source) (sources
 	return m.UpdateSource(ctx, in)
 }
 
+func (r resolving) DeleteSource(ctx context.Context, sourceID string) error {
+	m, err := r.manager(ctx)
+	if err != nil {
+		return err
+	}
+	return m.DeleteSource(ctx, sourceID)
+}
+
 func (r resolving) CreateAnnotation(ctx context.Context, in sources.Annotation) (sources.Annotation, error) {
 	m, err := r.manager(ctx)
 	if err != nil {

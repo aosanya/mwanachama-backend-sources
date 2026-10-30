@@ -4,7 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"gorm.io/gorm"
+
 	"github.com/aosanya/mwanachama-backend-shared/specstore"
+	"github.com/aosanya/mwanachama-backend-sources/models"
 )
 
 func (m *sourceManager) CreateSource(ctx context.Context, in Source) (Source, error) {
@@ -64,4 +67,30 @@ func (m *sourceManager) UpdateSource(ctx context.Context, in Source) (Source, er
 		return Source{}, fmt.Errorf("UpdateSource: %w", err)
 	}
 	return held, nil
+}
+
+func (m *sourceManager) DeleteSource(ctx context.Context, sourceID string) error {
+	if _, err := m.GetSource(ctx, sourceID); err != nil {
+		return err
+	}
+	var annotations int64
+	if err := m.st.Query(ctx, roleAnnotation).Where("source_id = ?", sourceID).Count(&annotations).Error; err != nil {
+		return fmt.Errorf("DeleteSource: %w", err)
+	}
+	if annotations > 0 {
+		return fmt.Errorf("%w: %d annotation(s) rest on it", ErrSourceInUse, annotations)
+	}
+	err := m.st.Query(ctx, roleSource).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Table(m.st.Table(roleChunk)).Where("source_id = ?", sourceID).Delete(nil).Error; err != nil {
+			return err
+		}
+		if err := tx.Table(m.st.Table(roleVerification)).Where("subject_role = ? AND subject_id = ?", models.SubjectSource, sourceID).Delete(nil).Error; err != nil {
+			return err
+		}
+		return tx.Table(m.st.Table(roleSource)).Where("id = ?", sourceID).Delete(nil).Error
+	})
+	if err != nil {
+		return fmt.Errorf("DeleteSource: %w", err)
+	}
+	return nil
 }

@@ -58,3 +58,13 @@ to allow filing documents.
 
 Upload, PDF or other file text extraction, embeddings (HS32), and mounting in
 wakala-api are other rows.
+
+## Taking a source back (DeleteSource)
+
+`DeleteSource` is a library method with no route and no tool. A host that files
+a source and then fails to file its document (the text is only whitespace, a
+store error) calls it to leave nothing behind. It removes the source, its
+chunks and the verifications whose subject is that source, in one transaction.
+A source that annotations rest on is refused with `ErrSourceInUse`, because the
+annotated content would lose what it cites; delete the annotations first.
+`ErrSourceNotFound` for an id that does not exist.
