@@ -27,7 +27,7 @@
       "title": "Read source",
       "description": "Read one source.",
       "args": [
-        { "from": "path", "as": "sourceID", "description": "The source to read." }
+        { "from": "path", "as": "sourceID", "refers": "sources.source", "description": "The source to read." }
       ],
       "returns": [{ "body": true }]
     },
@@ -53,6 +53,7 @@
         {
           "from": "path",
           "as": "sourceID",
+          "refers": "sources.source",
           "into": "ID",
           "description": "The source to revise. The address decides, not the body."
         }
@@ -86,7 +87,7 @@
       "title": "Read annotation",
       "description": "Read one annotation.",
       "args": [
-        { "from": "path", "as": "annotationID", "description": "The annotation to read." }
+        { "from": "path", "as": "annotationID", "refers": "sources.annotation", "description": "The annotation to read." }
       ],
       "returns": [{ "body": true }]
     },
@@ -109,7 +110,7 @@
       "title": "Remove annotation",
       "description": "Remove an annotation that should never have been made. Its verifications stay on record.",
       "args": [
-        { "from": "path", "as": "annotationID", "description": "The annotation to remove." }
+        { "from": "path", "as": "annotationID", "refers": "sources.annotation", "description": "The annotation to remove." }
       ],
       "returns": [{ "body": true }]
     },
@@ -155,6 +156,7 @@
         {
           "from": "path",
           "as": "sourceID",
+          "refers": "sources.source",
           "into": "SourceID",
           "description": "The source the passage is from. The address decides, not the body."
         }
@@ -174,6 +176,7 @@
         {
           "from": "path",
           "as": "sourceID",
+          "refers": "sources.source",
           "into": "SourceID",
           "description": "The source the document is the text of. The address decides, not the body."
         }
@@ -188,7 +191,7 @@
       "title": "List passages",
       "description": "Read one source's passages in order.",
       "args": [
-        { "from": "path", "as": "sourceID", "description": "The source whose passages to read." }
+        { "from": "path", "as": "sourceID", "refers": "sources.source", "description": "The source whose passages to read." }
       ],
       "returns": [{ "body": true }]
     },
