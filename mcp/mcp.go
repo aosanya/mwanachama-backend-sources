@@ -8,6 +8,8 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
+	"github.com/aosanya/mwanachama-backend-shared/dispatch"
+
 	sources "github.com/aosanya/mwanachama-backend-sources"
 	"github.com/aosanya/mwanachama-backend-sources/routes"
 )
@@ -29,7 +31,7 @@ func RegisterTools(server *mcp.Server, sm sources.SourceManager, m routes.Mount)
 
 func handlerFor(t routes.Tool) mcp.ToolHandler {
 	return func(ctx context.Context, req *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-		out, err := t.Invoke(ctx, req.Params.Arguments)
+		out, err := t.Handle(ctx, dispatch.Request{Arguments: req.Params.Arguments, Meta: req.Params.Meta})
 		if err != nil {
 			return &mcp.CallToolResult{
 				IsError: true,
